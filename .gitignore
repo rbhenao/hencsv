@@ -3,5 +3,7 @@
 **/hencsv.code-workspace
 **/__pycache__
 
-tmp_csv_files/
+csv_files/
+csv_files_2/
 csv_output_files/
+tmp_csv_files/

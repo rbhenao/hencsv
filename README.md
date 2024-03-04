@@ -1,2 +1,4 @@
 # hencsv
-Python repo for interactive csv utilities
+
+Python repo for interactive csv tool. 
+Tool iterates over csv files placed in csv_files dirctory.
