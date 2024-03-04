@@ -1,0 +1,7 @@
+.vscode/
+.ipynb_checkpoints/
+**/hencsv.code-workspace
+**/__pycache__
+
+tmp_csv_files/
+csv_output_files/

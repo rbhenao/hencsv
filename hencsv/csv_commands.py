@@ -3,9 +3,6 @@ import csv
 import os
 import sys
 import shutil
-import readline
-import glob
-from tabulate import tabulate
 
 import utils as utl
 
@@ -95,15 +92,8 @@ def apply_all(df, current_filename, undo_stack, command_stack):
     save(df, current_filename)
     return True
 
-@register_default_command('skip')
+@register_default_command('sk')
 def skip(*args):
-    return True
-
-@register_default_command('rst')
-def restore(df, filename, *args):
-    input_file_path, _, output_file_path, tmp_file_path = utl.file_paths(filename)
-    shutil.copy(input_file_path, tmp_file_path)
-    print(f"\rRestored {filename} to original")
     return True
 
 @register_default_command('q')
@@ -121,7 +111,20 @@ def display_original(df, filename, *args):
 def display_original_input():
     return ()
 
-# read every csv file in input dir and run merge program for user to merge cols
+###########################################
+######### CUSTOM COMMANDS BELOW ###########
+###########################################
+@register_command('rst')
+def restore_original(df, filename, *args):
+    input_file_path, _, _, tmp_file_path = utl.file_paths(filename)
+    shutil.copy(input_file_path, tmp_file_path)
+    df = pd.read_csv(tmp_file_path)
+    print(f"\rRestored to original file: {input_file_path}")
+    return df
+
+def restore_original_input():
+    return ()
+
 @register_command('mc')
 def merge_cols(df, filename, start_index, end_index, new_column_name = ''):
     # Store the columns to be merged in a separate DataFrame
@@ -151,6 +154,7 @@ def merge_cols_input():
 
     return (start_index, end_index, new_column_name)
 
+# Note replaces entire string if any substring matches target
 @register_command('srp')
 def string_replace(df, filename, target_replacement):
     target, replacement = target_replacement.split('/')
@@ -162,6 +166,7 @@ def string_replace_input():
     target_replacement = input("\rEnter the target and replacement strings separated by a slash (/): ")
     return (target_replacement,)
 
+# Joins columns from two separate csvs
 @register_command('jn')
 def join_columns(df, filename, filename2, insertion_index, start_column, end_column):
 
@@ -174,16 +179,7 @@ def join_columns(df, filename, filename2, insertion_index, start_column, end_col
     return df
 
 def join_columns_input():
-
-    # Temporarily set the completer for input
-    old_completer = readline.get_completer()
-    readline.set_completer(complete)
-    readline.parse_and_bind('tab: complete')
-
-    filename2 = input(f"\rEnter a csv file from {utl.input_dir2} (use tab completion): ")
-
-    # Restore the old completer
-    readline.set_completer(old_completer)
+    filename2 = utl.dir_tab_completion(f"\rEnter a csv file from {utl.input_dir2} (use tab completion): ",utl.input_dir2)
 
     df = pd.read_csv(filename2)
 
@@ -194,7 +190,3 @@ def join_columns_input():
     end_column = int(input(f"Enter the 0-index end column for file2: "))
 
     return (filename2, insertion_index, start_column, end_column)
-
-def complete(text, state):
-    dir_path = utl.input_dir2 + '/'
-    return (glob.glob(dir_path + '*') + [None])[state]
