@@ -100,6 +100,9 @@ def skip(*args):
 def quit(*args):
     return False
 
+###########################################
+######### CUSTOM COMMANDS BELOW ###########
+###########################################
 @register_command('dsp')
 def display_original(df, filename, *args):
     input_file_path, _, _, tmp_file_path = utl.file_paths(filename)
@@ -111,9 +114,6 @@ def display_original(df, filename, *args):
 def display_original_input():
     return ()
 
-###########################################
-######### CUSTOM COMMANDS BELOW ###########
-###########################################
 @register_command('rst')
 def restore_original(df, filename, *args):
     input_file_path, _, _, tmp_file_path = utl.file_paths(filename)
